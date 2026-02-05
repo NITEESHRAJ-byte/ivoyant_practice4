@@ -1,12 +1,9 @@
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class MvcDemo {
@@ -23,36 +20,48 @@ public class MvcDemo {
             BindingResult result,
             Model model) {
 
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            result.rejectValue("confirmPassword", "error.user", "Passwords must match");
+        }
+
         if (result.hasErrors()) {
             return "register";
         }
 
-        model.addAttribute("username", user.getUsername());
+        model.addAttribute("user", user);
         return "success";
     }
 
     public static class User {
 
-        @NotBlank
+        @NotBlank(message = "Username required")
         private String username;
 
-        @Email
+        @Email(message = "Invalid email")
+        @NotBlank
         private String email;
 
-        public String getUsername() {
-            return username;
-        }
+        @Min(value = 18, message = "Age must be 18+")
+        private int age;
 
-        public void setUsername(String username) {
-            this.username = username;
-        }
+        @Size(min = 6, message = "Password must be 6+ chars")
+        private String password;
 
-        public String getEmail() {
-            return email;
-        }
+        private String confirmPassword;
 
-        public void setEmail(String email) {
-            this.email = email;
-        }
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+
+        public int getAge() { return age; }
+        public void setAge(int age) { this.age = age; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+
+        public String getConfirmPassword() { return confirmPassword; }
+        public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
     }
 }
